@@ -8,20 +8,19 @@ class Application {
     this.server = fastify();
   }
 
-  async main() {
-    await AppDataSource.initialize();
-
-    this.server.get("/ping", async (request, reply) => {
-      return "pong\n";
-    });
-
-    this.server.listen({ port: config.port }, (err, address) => {
-      if (err) {
-        console.error(err);
-        process.exit(1);
-      }
+  async startHttpServer() {
+    try {
+      const address = await this.server.listen({ port: config.port });
       console.log(`Server listening at ${address}`);
-    });
+    } catch (error) {
+      console.log(error);
+      process.exit(1);
+    }
+  }
+
+  async main() {
+    await AppDataSource.initialize(); // Initialse data source
+    await this.startHttpServer(); // Start the server
   }
 }
 
